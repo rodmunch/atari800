@@ -51,6 +51,7 @@ static Atari800AudioDriver *sharedDriver = nil;
 OSStatus RenderCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlags, const AudioTimeStamp *inTimeStamp, UInt32 inBusNumber, UInt32 inNumberFrames, AudioBufferList *ioData)
 {
     __unsafe_unretained Atari800AudioDriver *driver = (__bridge Atari800AudioDriver *)inRefCon;
+    
     unsigned int framesize = inNumberFrames * sizeof(SInt16);
     
     if (Atari800AudioBufferDataSize(driver->_buffer) >= framesize) {
@@ -58,7 +59,12 @@ OSStatus RenderCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlag
     }
     else {
         memset(ioData->mBuffers[0].mData, 0, framesize);
-        putchar('+');
+        // putchar('+');
+    }
+    
+    for (int channel = 1; channel < ioData->mNumberBuffers; ++channel) {
+        
+        memcpy(ioData->mBuffers[channel].mData, ioData->mBuffers[0].mData, framesize);
     }
     
     return noErr;
@@ -107,16 +113,12 @@ OSStatus RenderCallback(void *inRefCon, AudioUnitRenderActionFlags *ioActionFlag
         AudioStreamBasicDescription outputStreamFormat;
         outputStreamFormat.mFormatID = kAudioFormatLinearPCM;
         outputStreamFormat.mSampleRate = SAMPLING_FREQUENCY_HZ;
-        outputStreamFormat.mChannelsPerFrame = 1;
+        outputStreamFormat.mChannelsPerFrame = 2;
         outputStreamFormat.mBitsPerChannel = 16;
         outputStreamFormat.mBytesPerPacket = 2;
         outputStreamFormat.mBytesPerFrame = 2;
         outputStreamFormat.mFramesPerPacket = 1;
-        outputStreamFormat.mFormatFlags =
-        kLinearPCMFormatFlagIsSignedInteger |
-        kLinearPCMFormatFlagIsPacked |
-        kLinearPCMFormatFlagIsNonInterleaved
-        | kLinearPCMFormatFlagIsBigEndian;
+        outputStreamFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked | kLinearPCMFormatFlagIsNonInterleaved | kLinearPCMFormatFlagIsBigEndian;
         
         //
         err = AudioUnitSetProperty (_outputUnit,

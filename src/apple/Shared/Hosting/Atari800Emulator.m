@@ -118,8 +118,21 @@ static Atari800Emulator *shared = nil;
 
 - (void)stopEmulation
 {
-    [_emulationThread cancel];
-    _emulationThread = nil;
+    @synchronized (self) {
+        
+        [_emulationThread cancel];
+        _emulationThread = nil;
+    }
+}
+
+- (void)setIsStereo:(BOOL)isStereo completion:(Atari800CompletionHandler)completion
+{
+    if (_isStereo != isStereo) {
+    
+        Atari800UICommandEnqueue(Atari800CommandChangeStereo, Atari800CommandParamNotRequired, (int)isStereo, @[], completion);
+        
+        _isStereo = isStereo;
+    }
 }
 
 - (void)setIsNTSC:(BOOL)isNTSC completion:(Atari800CompletionHandler)completion

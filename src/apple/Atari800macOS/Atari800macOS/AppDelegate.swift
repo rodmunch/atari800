@@ -22,6 +22,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ aNotification: Notification) {
     
+        if let emulator = Atari800Emulator.shared() {
+         
+            emulator.stopEmulation()
+        }
     }
     
     func application(_ sender: NSApplication, openFile filename: String) -> Bool {

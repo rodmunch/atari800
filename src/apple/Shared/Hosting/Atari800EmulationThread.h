@@ -20,6 +20,7 @@ typedef NS_ENUM(NSInteger, Atari800UICommandType) {
     Atari800CommandDismountDisk      = 6,
     Atari800CommandChangeVideoSystem = 7,
     Atari800CommandChangeRAMSize     = 8,
+    Atari800CommandChangeStereo      = 9,
 };
 
 typedef NS_ENUM(NSInteger, Atari800UICommandParamType) {

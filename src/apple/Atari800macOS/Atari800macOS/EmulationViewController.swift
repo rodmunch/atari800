@@ -145,6 +145,19 @@ class EmulationViewController: NSViewController {
         menuItem.state = NSControl.StateValue.on
     }
     
+    @IBAction func stereoChanged(_ sender: Any?) {
+        
+        if let emulator = Atari800Emulator.shared(), let menuItem = sender as? NSMenuItem {
+            
+            let stereo = (menuItem.state == .on)
+            
+            emulator.setIsStereo(!stereo, completion: { (ok, error) in
+                
+                menuItem.state = emulator.isStereo ? .on : .off
+            })
+        }
+    }
+    
     @IBAction func ramSizeChanged(_ sender: Any?) {
         
         if let emulator = Atari800Emulator.shared(), let menuItem = sender as? NSMenuItem {

@@ -80,6 +80,8 @@ extension DrivesViewController: NSTableViewDelegate {
                 return NSUserInterfaceItemIdentifier("Action Cell")
             case NSUserInterfaceItemIdentifier("Write Protect"):
                 return NSUserInterfaceItemIdentifier("Write Protect Cell")
+            case NSUserInterfaceItemIdentifier("Read Only"):
+                return NSUserInterfaceItemIdentifier("Read Only Cell")
             default:
                 break
             }
@@ -106,7 +108,7 @@ extension DrivesViewController: NSTableViewDelegate {
                 
                 break
                 
-            case NSUserInterfaceItemIdentifier("Write Protect"):
+            case NSUserInterfaceItemIdentifier("Read Only"):
                 break
                 
             default:
