@@ -7,13 +7,14 @@
 //
 
 #import "Atari800AudioBuffer.h"
+#import <stdatomic.h>
 
 @interface Atari800AudioBuffer() {
 @public
-    size_t _size;
+    NSUInteger _size;
     uint8_t *_buffer;
-    size_t _writePointer;
-    size_t _readPointer;
+    _Atomic(uint64_t) _writePointer;
+    _Atomic(uint64_t) _readPointer;
 }
 
 @end

@@ -10,8 +10,7 @@
 #import "Atari800Emulator.h"
 #import "Atari800Renderer.h"
 #import "Atari800Dispatch.h"
-
-#import <libkern/OSAtomic.h>
+#import <stdatomic.h>
 
 #import "antic.h"
 #import "atari.h"
@@ -25,6 +24,8 @@
 #import "cartridge.h"
 #import "sio.h"
 #import "memory.h"
+#import "pokeysnd.h"
+#import "cassette.h"
 
 #if __has_feature(objc_arc)
     #error This file must be compiled without ARC. Use -fno-objc-arc flag
@@ -47,8 +48,8 @@ typedef struct Atari800UICommand {
     __unsafe_unretained Atari800KeyboardHandler _keyboardHandler;
     __unsafe_unretained Atari800PortHandler _portHandler;
     
-    BOOL _running;
-    BOOL _paused;
+    _Atomic(BOOL) _running;
+    _Atomic(BOOL) _paused;
 }
 
 @end
@@ -253,6 +254,18 @@ NS_INLINE void Atari800ChangeVideoSystem(__unsafe_unretained Atari800EmulationTh
     Atari800CompleteCommand(thread, command, YES, nil);
 }
 
+NS_INLINE void Atari800ChangeStereo(__unsafe_unretained Atari800EmulationThread *thread, Atari800UICommand *command)
+{
+    //Sound_setup_t setup = Sound_desired;
+    
+    POKEYSND_stereo_enabled = !POKEYSND_stereo_enabled;
+    Sound_desired.channels = POKEYSND_stereo_enabled ? 2 : 1;
+    
+    Atari800_InitialiseMachine();
+
+    Atari800CompleteCommand(thread, command, YES, nil);
+}
+
 NS_INLINE void Atari800ChangeRAMSize(__unsafe_unretained Atari800EmulationThread *thread, Atari800UICommand *command)
 {
     int ramSize = (int)command->intParam;
@@ -278,6 +291,16 @@ NS_INLINE void Atari800Reset(__unsafe_unretained Atari800EmulationThread *thread
     Atari800CompleteCommand(thread, command, YES, nil);
 }
 
+NS_INLINE void Atari800MountCassette(__unsafe_unretained Atari800EmulationThread *thread, Atari800UICommand *command)
+{
+    NSCAssert(command->numberOfParameters == 1, @"No parameters specified for cassette mount");
+    const char *imageName = command->parameters[0];
+    CASSETTE_Insert(imageName);
+    CASSETTE_hold_start = TRUE;
+    Atari800_InitialiseMachine();
+    Atari800CompleteCommand(thread, command, YES, nil);
+}
+
 NS_INLINE void Atari800ProcessUICommand(__unsafe_unretained Atari800EmulationThread *thread, Atari800UICommand *command)
 {
     switch (command->command) {
@@ -295,7 +318,7 @@ NS_INLINE void Atari800ProcessUICommand(__unsafe_unretained Atari800EmulationThr
             break;
             
         case Atari800CommandLoadCassette:
-            
+            Atari800MountCassette(thread, command);
             break;
         
         case Atari800CommandReset:
@@ -316,6 +339,10 @@ NS_INLINE void Atari800ProcessUICommand(__unsafe_unretained Atari800EmulationThr
            
         case Atari800CommandChangeRAMSize:
             Atari800ChangeRAMSize(thread, command);
+            break;
+         
+        case Atari800CommandChangeStereo:
+            Atari800ChangeStereo(thread, command);
             break;
             
         default:

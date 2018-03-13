@@ -8,44 +8,45 @@
 
 #import "Atari800WindowController.h"
 #import "akey.h"
+#import <stdatomic.h>
 
-const uint8_t AtariStickUp    = 0x01;
-const uint8_t AtariStickDown  = 0x02;
-const uint8_t AtariStickLeft  = 0x04;
-const uint8_t AtariStickRight = 0x08;
+const uint64_t AtariStickUp    = 0x01;
+const uint64_t AtariStickDown  = 0x02;
+const uint64_t AtariStickLeft  = 0x04;
+const uint64_t AtariStickRight = 0x08;
 
-const uint8_t AtariStickNone  = 0x0F;
-const uint8_t AtariTriggerNone  = 0x01;
+const uint64_t AtariStickNone  = 0x0F;
+const uint64_t AtariTriggerNone  = 0x01;
 
-const uint8_t AtariConsoleStart  = 0x01;
-const uint8_t AtariConsoleSelect = 0x02;
-const uint8_t AtariConsoleOption = 0x04;
+const uint64_t AtariConsoleStart  = 0x01;
+const uint64_t AtariConsoleSelect = 0x02;
+const uint64_t AtariConsoleOption = 0x04;
 
-const uint8_t AtariStickUpMask    = 0xFE;
-const uint8_t AtariStickDownMask  = 0xFD;
-const uint8_t AtariStickLeftMask  = 0xFB;
-const uint8_t AtariStickRightMask = 0xF7;
+const uint64_t AtariStickUpMask    = 0xFE;
+const uint64_t AtariStickDownMask  = 0xFD;
+const uint64_t AtariStickLeftMask  = 0xFB;
+const uint64_t AtariStickRightMask = 0xF7;
 
-const uint8_t AtariConsoleStartMask  = 0xFE;
-const uint8_t AtariConsoleSelectMask = 0xFD;
-const uint8_t AtariConsoleOptionMask = 0xFB;
+const uint64_t AtariConsoleStartMask  = 0xFE;
+const uint64_t AtariConsoleSelectMask = 0xFD;
+const uint64_t AtariConsoleOptionMask = 0xFB;
 
 @interface Atari800WindowController() {
 @private
-    int _keycode;
-    int _shiftKey;
-    int _ctrlKey;
+    _Atomic(int64_t) _keycode;
+    _Atomic(int64_t) _shiftKey;
+    _Atomic(int64_t) _ctrlKey;
     
-    uint8_t _console;
-    uint8_t _trig0;
-    uint8_t _stick0;
+    _Atomic(uint64_t) _console;
+    _Atomic(uint64_t) _trig0;
+    _Atomic(uint64_t) _stick0;
 }
 
 @end
 
 @implementation Atari800WindowController
 
-NS_INLINE int Atari800TranslateKeycode(unichar character, uint8_t *stick0, uint8_t *console)
+NS_INLINE int Atari800TranslateKeycode(unichar character, _Atomic(uint64_t) *stick0, _Atomic(uint64_t) *console)
 {
     int result = AKEY_NONE;
     
