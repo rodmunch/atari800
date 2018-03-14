@@ -12,6 +12,8 @@ import Atari800EmulationCore
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
+    var terminationReply: NSApplication.TerminateReply?
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
     
         if let emulator = Atari800Emulator.shared() {
@@ -20,12 +22,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        
+        guard let emulator = Atari800Emulator.shared() else {
+            
+            return .terminateNow
+        }
+        
+        if let result = terminationReply {
+            
+            return result
+        }
+        
+        emulator.stopEmulation { (ok, error) in
+            
+            self.terminationReply = .terminateNow
+            sender.terminate(self)
+        }
+        
+        terminationReply = .terminateLater
+        
+        return terminationReply!
+    }
+    
     func applicationWillTerminate(_ aNotification: Notification) {
     
-        if let emulator = Atari800Emulator.shared() {
-         
-            emulator.stopEmulation()
-        }
     }
     
     func application(_ sender: NSApplication, openFile filename: String) -> Bool {

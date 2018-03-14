@@ -13,6 +13,7 @@
 
 @interface Atari800QuartzRenderer() {
     
+    BOOL _rendering;
     size_t _screenLength;
     size_t _width;
     size_t _height;
@@ -47,10 +48,15 @@ void Atari800QuartzReleaseData(void *info, const void *data, size_t size)
 #if TARGET_OS_SIMULATOR
     NSLog(@"Falling back to Quartz rendering for simulator.");
 #else
-    NSAssert(NO, @"Atari800QuartzRenderer is for simulator reendering only!");
+    NSAssert(NO, @"Atari800QuartzRenderer is for simulator rendering only!");
 #endif
     
     self = [super init];
+    
+    if (self) {
+        
+        _rendering = YES;
+    }
     
     return self;
 }
@@ -136,6 +142,9 @@ void Atari800QuartzReleaseData(void *info, const void *data, size_t size)
 
 - (void)render:(id)sender
 {
+    if (!_rendering)
+        return;
+    
     uint32_t *image = [_imageData mutableBytes];
     const uint8_t *screen = [_screen bytes];
     const uint32_t *palette = [_palette bytes];

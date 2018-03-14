@@ -7,6 +7,7 @@
 #import "Atari800ShaderTypes.h"
 
 @interface Atari800MetalRenderer() {
+    __weak MTKView *_metalView;
     id<MTLDevice> _device;
     id<MTLRenderPipelineState> _pipelineState;
     id<MTLCommandQueue> _commandQueue;
@@ -27,11 +28,11 @@
     NSParameterAssert(view);
     NSAssert([view isKindOfClass:[MTKView class]], @"Invalid view class.");
     
-    MTKView *metalView = (MTKView *)view;
+    _metalView = (MTKView *)view;
     
-    _device = metalView.device;
+    _device = _metalView.device;
     
-    [self updateVertices:metalView.drawableSize];
+    [self updateVertices:_metalView.drawableSize];
     
     _screenSize.x = (unsigned int)width;
     _screenSize.y = (unsigned int)height;
@@ -63,7 +64,7 @@
     pipelineStateDescriptor.label = @"Atari Drawing Pipeline";
     pipelineStateDescriptor.vertexFunction = vertexFunction;
     pipelineStateDescriptor.fragmentFunction = fragmentFunction;
-    pipelineStateDescriptor.colorAttachments[0].pixelFormat = metalView.colorPixelFormat;
+    pipelineStateDescriptor.colorAttachments[0].pixelFormat = _metalView.colorPixelFormat;
     
     NSError *error = NULL;
     _pipelineState = [_device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor
@@ -75,7 +76,7 @@
     
     _commandQueue = [_device newCommandQueue];
     
-    metalView.delegate = self;
+    _metalView.delegate = self;
 }
 
 - (uint8_t *)screen
@@ -131,6 +132,11 @@
     _viewportSize.y = size.height;
     
     [self updateVertices:size];
+}
+
+- (void)stopRendering
+{
+    _metalView.delegate = nil;
 }
 
 /// Called whenever the view needs to render a frame

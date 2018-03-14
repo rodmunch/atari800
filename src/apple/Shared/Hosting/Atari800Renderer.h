@@ -12,6 +12,7 @@
 
 @property (nonatomic, readonly) uint8_t *screen;
 
+- (void)stopRendering;
 - (void)setupForView:(id)view widthInPixels:(NSInteger)width heightInScanLines:(NSInteger)height;
 
 @end

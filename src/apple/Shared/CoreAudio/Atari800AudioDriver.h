@@ -10,4 +10,6 @@
 
 @interface Atari800AudioDriver : NSObject
 
+- (void)stopSound;
+
 @end

@@ -116,13 +116,14 @@ static Atari800Emulator *shared = nil;
     Atari800UICommandEnqueue(Atari800CommandRemoveCartridge, Atari800CommandParamNotRequired, 0, @[], completion);
 }
 
-- (void)stopEmulation
+- (void)stopEmulation:(Atari800CompletionHandler)completion;
 {
-    @synchronized (self) {
+    Atari800UICommandEnqueue(Atari800CommandQuit, Atari800CommandParamNotRequired, 0, @[], completion);
+    /*@synchronized (self) {
         
         [_emulationThread cancel];
         _emulationThread = nil;
-    }
+    }*/
 }
 
 - (void)setIsStereo:(BOOL)isStereo completion:(Atari800CompletionHandler)completion

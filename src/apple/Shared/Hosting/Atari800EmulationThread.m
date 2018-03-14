@@ -10,6 +10,8 @@
 #import "Atari800Emulator.h"
 #import "Atari800Renderer.h"
 #import "Atari800Dispatch.h"
+#import "Atari800AudioDriver.h"
+#import <libkern/osatomic.h>
 #import <stdatomic.h>
 
 #import "antic.h"
@@ -301,10 +303,23 @@ NS_INLINE void Atari800MountCassette(__unsafe_unretained Atari800EmulationThread
     Atari800CompleteCommand(thread, command, YES, nil);
 }
 
+NS_INLINE void Atari800Quit(__unsafe_unretained Atari800EmulationThread *thread, Atari800UICommand *command)
+{
+    NSCAssert(command->numberOfParameters == 0, @"parameters specified for cassette mount");
+    
+    Atari800_Exit(0);
+    [thread cancel];
+    Atari800CompleteCommand(thread, command, YES, nil);
+}
+
 NS_INLINE void Atari800ProcessUICommand(__unsafe_unretained Atari800EmulationThread *thread, Atari800UICommand *command)
 {
     switch (command->command) {
         
+        case Atari800CommandQuit:
+            Atari800Quit(thread, command);
+            break;
+            
         case Atari800CommandBinaryLoad:
             Atari800BinaryLoad(thread, command);
             break;
@@ -449,6 +464,8 @@ void Atari800StartEmulation(__unsafe_unretained Atari800EmulationThread *thread)
 - (void)cancel
 {
     _running = NO;
+    [_renderer stopRendering];
+    [_emulator.audioDriver stopSound];
     [super cancel];
 }
 

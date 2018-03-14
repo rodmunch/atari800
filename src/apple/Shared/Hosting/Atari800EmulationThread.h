@@ -11,16 +11,17 @@
 
 typedef NS_ENUM(NSInteger, Atari800UICommandType) {
     
-    Atari800CommandBinaryLoad        = 0,
-    Atari800CommandMountDisk         = 1,
-    Atari800CommandInsertCartridge   = 2,
-    Atari800CommandLoadCassette      = 3,
-    Atari800CommandReset             = 4,
-    Atari800CommandRemoveCartridge   = 5,
-    Atari800CommandDismountDisk      = 6,
-    Atari800CommandChangeVideoSystem = 7,
-    Atari800CommandChangeRAMSize     = 8,
-    Atari800CommandChangeStereo      = 9,
+    Atari800CommandQuit,
+    Atari800CommandBinaryLoad,
+    Atari800CommandMountDisk,
+    Atari800CommandInsertCartridge,
+    Atari800CommandLoadCassette,
+    Atari800CommandReset,
+    Atari800CommandRemoveCartridge,
+    Atari800CommandDismountDisk,
+    Atari800CommandChangeVideoSystem,
+    Atari800CommandChangeRAMSize,
+    Atari800CommandChangeStereo,
 };
 
 typedef NS_ENUM(NSInteger, Atari800UICommandParamType) {

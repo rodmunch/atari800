@@ -37,7 +37,7 @@ typedef void (^Atari800CartridgeSelectionHandler)(BOOL ok, NSInteger cartridgeTy
 @property (nonatomic, assign) BOOL isNTSC;
 
 - (void)startEmulation;
-- (void)stopEmulation;
+- (void)stopEmulation:(Atari800CompletionHandler)completion;
 
 - (void)removeCartridge:(Atari800CompletionHandler)completion;
 - (void)reset;
